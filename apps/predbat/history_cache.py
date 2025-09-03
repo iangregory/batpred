@@ -56,13 +56,11 @@ class HistoryCache:
                 if latest_time is None or latest_time < end_time:
                     fetch_start_time = latest_time or start_time
 
-        # Fetch new data outside the lock to avoid blocking
         if fetch_start_time:
             new_data = fetch_func(fetch_start_time, end_time)
             if new_data:
                 self.update_cache(entity_id, new_data)
 
-        # Process and return data from the cache under lock
         with self.cache_lock:
             cache_entry = self.cache_data.get(entity_key)
             if not cache_entry:
@@ -100,7 +98,6 @@ class HistoryCache:
             cache_entry = self.cache_data[entity_key]
             existing_data: Deque[Dict] = cache_entry["data"]
 
-            # Simply extend the deque with the new data
             existing_data.extend(new_data)
 
             # Update the latest timestamp from the last item in the new data
