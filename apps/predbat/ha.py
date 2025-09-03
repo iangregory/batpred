@@ -435,11 +435,15 @@ class HAInterface:
         else:
             self.log("Warn: Failed to update state data from HA")
 
-    def get_history(self, sensor, now, days=30, force_db=False):
+    def get_history(self, sensor, now, days=30, force_db=False, minimal=False):
         """
         Get the history for a sensor from Home Assistant.
 
         :param sensor: The sensor to get the history for.
+        :param now: The current time.
+        :param days: The number of days to look back.
+        :param force_db: Whether to force using the database.
+        :param minimal: Whether to return minimal data from HA.
         :return: The history for the sensor.
         """
         if not sensor:
@@ -452,7 +456,10 @@ class HAInterface:
 
         start = now - timedelta(days=days)
         end = now
-        res = self.api_call("/api/history/period/{}".format(start.strftime(TIME_FORMAT_HA)), {"filter_entity_id": sensor, "end_time": end.strftime(TIME_FORMAT_HA)})
+        params = {"filter_entity_id": sensor, "end_time": end.strftime(TIME_FORMAT_HA)}
+        if minimal:
+            params["minimal_response"] = ""
+        res = self.api_call("/api/history/period/{}".format(start.strftime(TIME_FORMAT_HA)),params)
         return res
 
     async def set_state_external(self, entity_id, state, attributes={}):
