@@ -12,9 +12,7 @@ import copy
 import os
 import sys
 from datetime import datetime, timedelta
-import time
 import traceback
-import sys
 import gc
 
 # from memory_profiler import profile
@@ -314,13 +312,10 @@ class PredBat(hass.Hass, Octopus, Energidataservice, Solcast, GECloud, Alertfeed
             self.log("Error: get_history_wrapper - No HA interface available")
             return None
 
-        self.log(f"Getting history for {entity_id} for the last {days} days")
+        self.log("Getting history for {} for the last {} days".format(entity_id, days))
 
-        # Log how long the fetch took
-        start_time = time.monotonic()
         history = self.ha_interface.get_history(entity_id, days=days, now=self.now_utc)
-        end_time = time.monotonic()
-        self.log(f"Getting history for {entity_id} took {end_time - start_time:.2f} seconds")
+        self.log("Got history for {}".format(entity_id))
 
         if required and (history is None):
             self.log("Error: Failure to fetch history for {}".format(entity_id))
