@@ -36,10 +36,10 @@ class HistoryCache:
         return None
 
     def get_or_fetch(self, entity_id: str, start_time: datetime, end_time: datetime,
-                     fetch_func, minimal: bool = False) -> Optional[List[Dict]]:
+                     fetch_func) -> Optional[List[Dict]]:
         """Get cached data or fetch missing data using provided function"""
         if not self.enabled:
-            return fetch_func(start_time, end_time, minimal)
+            return fetch_func(start_time, end_time)
 
         with self.cache_lock:
             entity_key = entity_id.lower()
@@ -47,7 +47,7 @@ class HistoryCache:
 
             # Helper function to fetch and update cache
             def fetch_and_update(fetch_start, fetch_end):
-                new_data = fetch_func(fetch_start, fetch_end, minimal)
+                new_data = fetch_func(fetch_start, fetch_end)
                 if new_data:
                     self.update_cache(entity_id, new_data, end_time)
                 return new_data

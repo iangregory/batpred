@@ -443,7 +443,7 @@ class HAInterface:
         else:
             self.log("Warn: Failed to update state data from HA")
 
-    def get_history(self, sensor, now, days=30, force_db=False, minimal=False):
+    def get_history(self, sensor, now, days=30, force_db=False):
         """
         Get the history for a sensor from Home Assistant.
 
@@ -451,7 +451,6 @@ class HAInterface:
         :param now: The current time.
         :param days: The number of days to look back.
         :param force_db: Whether to force using the database.
-        :param minimal: Whether to return minimal data from HA.
         :return: The history for the sensor.
         """
         if not sensor:
@@ -466,14 +465,11 @@ class HAInterface:
         end = now
 
         # Use cache with fetch function
-        def fetch_data(start, end, minimal):
-            params = {"filter_entity_id": sensor, "end_time": end.strftime(TIME_FORMAT_HA)}
-            if minimal:
-                params["minimal_response"] = ""
-            res = self.api_call("/api/history/period/{}".format(start.strftime(TIME_FORMAT_HA)),params)
+        def fetch_data(start, end):
+            res = self.api_call("/api/history/period/{}".format(start.strftime(TIME_FORMAT_HA)),{"filter_entity_id": sensor, "end_time": end.strftime(TIME_FORMAT_HA)})
             return res[0] if res and isinstance(res, list) and len(res) > 0 else []
 
-        result = self.history_cache.get_or_fetch(sensor, start, end, fetch_data, minimal)
+        result = self.history_cache.get_or_fetch(sensor, start, end, fetch_data)
         return [result] if result else []
 
     async def set_state_external(self, entity_id, state, attributes={}):

@@ -305,16 +305,16 @@ class PredBat(hass.Hass, Octopus, Energidataservice, Solcast, GECloud, Alertfeed
             return False
         return self.ha_interface.get_services()
 
-    def get_history_wrapper(self, entity_id, days=30, required=True, minimal=False):
+    def get_history_wrapper(self, entity_id, days=30, required=True):
         """
         Wrapper function to get history from HA
         """
         if not self.ha_interface:
             self.log("Error: get_history_wrapper - No HA interface available")
             return None
-        self.log(f"$$$$: Fetching history for {entity_id} over the last {days} days, minimal={minimal}")
+        self.log(f"$$$$: Fetching history for {entity_id} over the last {days} days")
 
-        history = self.ha_interface.get_history(entity_id, days=days, now=self.now_utc, minimal=minimal)
+        history = self.ha_interface.get_history(entity_id, days=days, now=self.now_utc)
 
         if required and (history is None):
             self.log("Error: Failure to fetch history for {}".format(entity_id))
