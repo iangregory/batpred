@@ -388,10 +388,10 @@ class Fetch:
         load_minutes = {}
         age_days = None
         for entity_id in entity_ids:
-            try:
-                history = self.get_history_wrapper(entity_id=entity_id, days=max_days_previous, minimal=True)
-            except (ValueError, TypeError):
-                history = []
+            #try:
+            history = self.get_history_wrapper(entity_id=entity_id, days=max_days_previous, minimal=True)
+            #except (ValueError, TypeError):
+            #    history = []
 
             if history:
                 item = history[0][0]
@@ -2278,6 +2278,11 @@ class Fetch:
 
         # Update list of config options to save/restore to
         self.update_save_restore_list()
+
+        # Configure history cache
+        self.history_cache_enable = self.get_arg("history_cache_enable", True)
+        if hasattr(self, 'ha_interface') and self.ha_interface:
+            self.ha_interface.configure_history_cache(self.history_cache_enable)
 
     def load_car_energy(self, now_utc):
         """
